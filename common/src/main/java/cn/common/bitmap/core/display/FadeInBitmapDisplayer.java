@@ -1,4 +1,4 @@
-﻿
+
 package cn.common.bitmap.core.display;
 
 import android.graphics.Bitmap;
@@ -10,12 +10,6 @@ import android.widget.ImageView;
 import cn.common.bitmap.core.assist.LoadedFrom;
 import cn.common.bitmap.core.imageaware.ImageAware;
 
-/**
- * Displays image with "fade in" animation
- *
- * @author Sergey Tarasevich (nostra13[at]gmail[dot]com), Daniel Martí
- * @since 1.6.4
- */
 public class FadeInBitmapDisplayer implements BitmapDisplayer {
 
     private final int durationMillis;

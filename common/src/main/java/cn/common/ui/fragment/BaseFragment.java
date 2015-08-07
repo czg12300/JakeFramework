@@ -17,6 +17,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.common.ui.activity.IUi;
+
 public abstract class BaseFragment extends Fragment implements IUi {
     protected static final int REQUEST_CODE = 0x125f;
 

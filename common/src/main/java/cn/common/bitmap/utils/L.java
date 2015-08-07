@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package cn.common.bitmap.utils;
 
 import android.util.Log;
-import com.nostra13.universalimageloader.core.ImageLoader;
+
+import cn.common.bitmap.core.ImageLoader;
 
 /**
  * "Less-word" analog of Android {@link android.util.Log logger}
@@ -26,88 +28,95 @@ import com.nostra13.universalimageloader.core.ImageLoader;
  */
 public final class L {
 
-	private static final String LOG_FORMAT = "%1$s\n%2$s";
-	private static volatile boolean writeDebugLogs = false;
-	private static volatile boolean writeLogs = true;
+    private static final String LOG_FORMAT = "%1$s\n%2$s";
 
-	private L() {
-	}
+    private static volatile boolean writeDebugLogs = false;
 
-	/**
-	 * Enables logger (if {@link #disableLogging()} was called before)
-	 *
-	 * @deprecated Use {@link #writeLogs(boolean) writeLogs(true)} instead
-	 */
-	@Deprecated
-	public static void enableLogging() {
-		writeLogs(true);
-	}
+    private static volatile boolean writeLogs = true;
 
-	/**
-	 * Disables logger, no logs will be passed to LogCat, all log methods will do nothing
-	 *
-	 * @deprecated Use {@link #writeLogs(boolean) writeLogs(false)} instead
-	 */
-	@Deprecated
-	public static void disableLogging() {
-		writeLogs(false);
-	}
+    private L() {
+    }
 
-	/**
-	 * Enables/disables detail logging of {@link ImageLoader} work.
-	 * Consider {@link com.nostra13.universalimageloader.utils.L#disableLogging()} to disable
-	 * ImageLoader logging completely (even error logs)<br />
-	 * Debug logs are disabled by default.
-	 */
-	public static void writeDebugLogs(boolean writeDebugLogs) {
-		L.writeDebugLogs = writeDebugLogs;
-	}
+    /**
+     * Enables logger (if {@link #disableLogging()} was called before)
+     *
+     * @deprecated Use {@link #writeLogs(boolean) writeLogs(true)} instead
+     */
+    @Deprecated
+    public static void enableLogging() {
+        writeLogs(true);
+    }
 
-	/** Enables/disables logging of {@link ImageLoader} completely (even error logs). */
-	public static void writeLogs(boolean writeLogs) {
-		L.writeLogs = writeLogs;
-	}
+    /**
+     * Disables logger, no logs will be passed to LogCat, all log methods will
+     * do nothing
+     *
+     * @deprecated Use {@link #writeLogs(boolean) writeLogs(false)} instead
+     */
+    @Deprecated
+    public static void disableLogging() {
+        writeLogs(false);
+    }
 
-	public static void d(String message, Object... args) {
-		if (writeDebugLogs) {
-			log(Log.DEBUG, null, message, args);
-		}
-	}
+    /**
+     * Enables/disables detail logging of {@link ImageLoader} work. Consider
+     * {@link com.nostra13.universalimageloader.utils.L#disableLogging()} to
+     * disable ImageLoader logging completely (even error logs)<br />
+     * Debug logs are disabled by default.
+     */
+    public static void writeDebugLogs(boolean writeDebugLogs) {
+        L.writeDebugLogs = writeDebugLogs;
+    }
 
-	public static void i(String message, Object... args) {
-		log(Log.INFO, null, message, args);
-	}
+    /**
+     * Enables/disables logging of {@link ImageLoader} completely (even error
+     * logs).
+     */
+    public static void writeLogs(boolean writeLogs) {
+        L.writeLogs = writeLogs;
+    }
 
-	public static void w(String message, Object... args) {
-		log(Log.WARN, null, message, args);
-	}
+    public static void d(String message, Object... args) {
+        if (writeDebugLogs) {
+            log(Log.DEBUG, null, message, args);
+        }
+    }
 
-	public static void e(Throwable ex) {
-		log(Log.ERROR, ex, null);
-	}
+    public static void i(String message, Object... args) {
+        log(Log.INFO, null, message, args);
+    }
 
-	public static void e(String message, Object... args) {
-		log(Log.ERROR, null, message, args);
-	}
+    public static void w(String message, Object... args) {
+        log(Log.WARN, null, message, args);
+    }
 
-	public static void e(Throwable ex, String message, Object... args) {
-		log(Log.ERROR, ex, message, args);
-	}
+    public static void e(Throwable ex) {
+        log(Log.ERROR, ex, null);
+    }
 
-	private static void log(int priority, Throwable ex, String message, Object... args) {
-		if (!writeLogs) return;
-		if (args.length > 0) {
-			message = String.format(message, args);
-		}
+    public static void e(String message, Object... args) {
+        log(Log.ERROR, null, message, args);
+    }
 
-		String log;
-		if (ex == null) {
-			log = message;
-		} else {
-			String logMessage = message == null ? ex.getMessage() : message;
-			String logBody = Log.getStackTraceString(ex);
-			log = String.format(LOG_FORMAT, logMessage, logBody);
-		}
-		Log.println(priority, ImageLoader.TAG, log);
-	}
+    public static void e(Throwable ex, String message, Object... args) {
+        log(Log.ERROR, ex, message, args);
+    }
+
+    private static void log(int priority, Throwable ex, String message, Object... args) {
+        if (!writeLogs)
+            return;
+        if (args.length > 0) {
+            message = String.format(message, args);
+        }
+
+        String log;
+        if (ex == null) {
+            log = message;
+        } else {
+            String logMessage = message == null ? ex.getMessage() : message;
+            String logBody = Log.getStackTraceString(ex);
+            log = String.format(LOG_FORMAT, logMessage, logBody);
+        }
+        Log.println(priority, ImageLoader.TAG, log);
+    }
 }

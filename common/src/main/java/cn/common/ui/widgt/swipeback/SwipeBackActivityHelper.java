@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 
-import cn.jake.fitness.ui.widgt.ChangeThemeUtils;
+import cn.common.ui.widgt.ChangeThemeUtils;
 
 public class SwipeBackActivityHelper {
     private Activity mActivity;

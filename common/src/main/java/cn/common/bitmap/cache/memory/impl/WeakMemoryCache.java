@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package cn.common.bitmap.cache.memory.impl;
 
 import android.graphics.Bitmap;
-import com.nostra13.universalimageloader.cache.memory.BaseMemoryCache;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
+import cn.common.bitmap.cache.memory.BaseMemoryCache;
+
 /**
- * Memory cache with {@linkplain WeakReference weak references} to {@linkplain android.graphics.Bitmap bitmaps}<br />
+ * Memory cache with {@linkplain WeakReference weak references} to
+ * {@linkplain android.graphics.Bitmap bitmaps}<br />
  * <br />
  * <b>NOTE:</b> This cache uses only weak references for stored Bitmaps.
  *
@@ -30,8 +33,8 @@ import java.lang.ref.WeakReference;
  * @since 1.5.3
  */
 public class WeakMemoryCache extends BaseMemoryCache {
-	@Override
-	protected Reference<Bitmap> createReference(Bitmap value) {
-		return new WeakReference<Bitmap>(value);
-	}
+    @Override
+    protected Reference<Bitmap> createReference(Bitmap value) {
+        return new WeakReference<Bitmap>(value);
+    }
 }

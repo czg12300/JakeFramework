@@ -13,80 +13,87 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package cn.common.bitmap.core.imageaware;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
-import com.nostra13.universalimageloader.core.assist.ViewScaleType;
+
+import cn.common.bitmap.core.assist.ImageSize;
+import cn.common.bitmap.core.assist.ViewScaleType;
 
 /**
- * ImageAware which provides needed info for processing of original image but do nothing for displaying image. It's
- * used when user need just load and decode image and get it in {@linkplain
- * com.nostra13.universalimageloader.core.listener.ImageLoadingListener#onLoadingComplete(String, android.view.View,
- * android.graphics.Bitmap) callback}.
+ * ImageAware which provides needed info for processing of original image but do
+ * nothing for displaying image. It's used when user need just load and decode
+ * image and get it in
+ * {@linkplain com.nostra13.universalimageloader.core.listener.ImageLoadingListener#onLoadingComplete(String, android.view.View, android.graphics.Bitmap)
+ * callback}.
  *
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
  * @since 1.9.0
  */
 public class NonViewAware implements ImageAware {
 
-	protected final String imageUri;
-	protected final ImageSize imageSize;
-	protected final ViewScaleType scaleType;
+    protected final String imageUri;
 
-	public NonViewAware(ImageSize imageSize, ViewScaleType scaleType) {
-		this(null, imageSize, scaleType);
-	}
+    protected final ImageSize imageSize;
 
-	public NonViewAware(String imageUri, ImageSize imageSize, ViewScaleType scaleType) {
-		if (imageSize == null) throw new IllegalArgumentException("imageSize must not be null");
-		if (scaleType == null) throw new IllegalArgumentException("scaleType must not be null");
+    protected final ViewScaleType scaleType;
 
-		this.imageUri = imageUri;
-		this.imageSize = imageSize;
-		this.scaleType = scaleType;
-	}
+    public NonViewAware(ImageSize imageSize, ViewScaleType scaleType) {
+        this(null, imageSize, scaleType);
+    }
 
-	@Override
-	public int getWidth() {
-		return imageSize.getWidth();
-	}
+    public NonViewAware(String imageUri, ImageSize imageSize, ViewScaleType scaleType) {
+        if (imageSize == null)
+            throw new IllegalArgumentException("imageSize must not be null");
+        if (scaleType == null)
+            throw new IllegalArgumentException("scaleType must not be null");
 
-	@Override
-	public int getHeight() {
-		return imageSize.getHeight();
-	}
+        this.imageUri = imageUri;
+        this.imageSize = imageSize;
+        this.scaleType = scaleType;
+    }
 
-	@Override
-	public ViewScaleType getScaleType() {
-		return scaleType;
-	}
+    @Override
+    public int getWidth() {
+        return imageSize.getWidth();
+    }
 
-	@Override
-	public View getWrappedView() {
-		return null;
-	}
+    @Override
+    public int getHeight() {
+        return imageSize.getHeight();
+    }
 
-	@Override
-	public boolean isCollected() {
-		return false;
-	}
+    @Override
+    public ViewScaleType getScaleType() {
+        return scaleType;
+    }
 
-	@Override
-	public int getId() {
-		return TextUtils.isEmpty(imageUri) ? super.hashCode() : imageUri.hashCode();
-	}
+    @Override
+    public View getWrappedView() {
+        return null;
+    }
 
-	@Override
-	public boolean setImageDrawable(Drawable drawable) { // Do nothing
-		return true;
-	}
+    @Override
+    public boolean isCollected() {
+        return false;
+    }
 
-	@Override
-	public boolean setImageBitmap(Bitmap bitmap) { // Do nothing
-		return true;
-	}
+    @Override
+    public int getId() {
+        return TextUtils.isEmpty(imageUri) ? super.hashCode() : imageUri.hashCode();
+    }
+
+    @Override
+    public boolean setImageDrawable(Drawable drawable) { // Do nothing
+        return true;
+    }
+
+    @Override
+    public boolean setImageBitmap(Bitmap bitmap) { // Do nothing
+        return true;
+    }
 }

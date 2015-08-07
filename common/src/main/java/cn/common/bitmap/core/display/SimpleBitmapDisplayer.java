@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package cn.common.bitmap.core.display;
 
 import android.graphics.Bitmap;
-import com.nostra13.universalimageloader.core.assist.LoadedFrom;
-import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+
+import cn.common.bitmap.core.assist.LoadedFrom;
+import cn.common.bitmap.core.imageaware.ImageAware;
 
 /**
- * Just displays {@link Bitmap} in {@link com.nostra13.universalimageloader.core.imageaware.ImageAware}
+ * Just displays {@link Bitmap} in
+ * {@link com.nostra13.universalimageloader.core.imageaware.ImageAware}
  *
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
  * @since 1.5.6
  */
 public final class SimpleBitmapDisplayer implements BitmapDisplayer {
-	@Override
-	public void display(Bitmap bitmap, ImageAware imageAware, LoadedFrom loadedFrom) {
-		imageAware.setImageBitmap(bitmap);
-	}
+    @Override
+    public void display(Bitmap bitmap, ImageAware imageAware, LoadedFrom loadedFrom) {
+        imageAware.setImageBitmap(bitmap);
+    }
 }
