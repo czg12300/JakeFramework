@@ -1,4 +1,2 @@
 .gradle/
 .idea/
-app/build/generated/source/buildConfig/androidTest/debug/cn/jake/app/test/BuildConfig.java
-app/
