@@ -5,6 +5,7 @@
 
     <style name="base_activity_style" parent="android:Theme.Light">
         <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="base_swipe_activity_style" parent="base_activity_style">

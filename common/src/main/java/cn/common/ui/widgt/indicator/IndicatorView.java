@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * has under line's tab
- * 
+ *
  * @author jake
  */
 public class IndicatorView extends LinearLayout
@@ -52,7 +52,8 @@ public class IndicatorView extends LinearLayout
 
     private int mSelectedTab = 0;
 
-    private final int BSSEEID = 0xffff0;;
+    private final int BSSEEID = 0xffff0;
+    ;
 
     private int mCurrID = 0;
 
@@ -107,7 +108,7 @@ public class IndicatorView extends LinearLayout
         mPaintUnderLineNormal = new Paint();
         mPaintUnderLineNormal.setColor(underLineColor);
         mPaintUnderLineNormal.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaintUnderLineNormal.setStrokeWidth(dip(1.5f) / 2);
+        mPaintUnderLineNormal.setStrokeWidth(1);
         mPathNormal = new Path();
         mPathSelected = new Path();
     }
@@ -116,7 +117,7 @@ public class IndicatorView extends LinearLayout
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         float xScroll = 0;
-        if (mTabs.size() != 0) {
+        if (mTabs != null && mTabs.size() != 0) {
             mPerItemWidth = getWidth() / mTabs.size();
             int tabID = mSelectedTab;
             xScroll = (mCurrentScroll - ((tabID) * (getWidth() + mViewPager.getPageMargin())))
@@ -141,10 +142,10 @@ public class IndicatorView extends LinearLayout
             }
             mPathNormal.reset();
             mPathSelected.reset();
-            mPathNormal.moveTo(0, getHeight() - mPaintUnderLineNormal.getStrokeWidth());
-            mPathNormal.lineTo(getWidth(), getHeight() - mPaintUnderLineNormal.getStrokeWidth());
-            mPathSelected.moveTo(xLeft, getHeight() - mPaintUnderLineSelected.getStrokeWidth());
-            mPathSelected.lineTo(xRight, getHeight() - mPaintUnderLineSelected.getStrokeWidth());
+            mPathNormal.moveTo(0, getHeight() - mPaintUnderLineNormal.getStrokeWidth() / 2);
+            mPathNormal.lineTo(getWidth(), getHeight() - mPaintUnderLineNormal.getStrokeWidth() / 2);
+            mPathSelected.moveTo(xLeft, getHeight() - mPaintUnderLineSelected.getStrokeWidth() / 2 - mPaintUnderLineNormal.getStrokeWidth());
+            mPathSelected.lineTo(xRight, getHeight() - mPaintUnderLineSelected.getStrokeWidth() / 2 - mPaintUnderLineNormal.getStrokeWidth());
             canvas.drawPath(mPathNormal, mPaintUnderLineNormal);
             canvas.drawPath(mPathSelected, mPaintUnderLineSelected);
         }
@@ -308,7 +309,7 @@ public class IndicatorView extends LinearLayout
 
     /**
      * set tab text size
-     * 
+     *
      * @param textSize
      */
     public void setTextSize(float textSize) {
@@ -317,12 +318,21 @@ public class IndicatorView extends LinearLayout
 
     /**
      * set under line height
-     * 
+     *
      * @param footerLineHeight
      */
-    public void setUndlerLineHeight(float footerLineHeight) {
+    public void setUnderLineHeight(float footerLineHeight) {
         mPaintUnderLineSelected.setStrokeWidth(footerLineHeight);
-        mPaintUnderLineNormal.setStrokeWidth(footerLineHeight / 2);
+        invalidate();
+    }
+
+    /**
+     * set under line normal height
+     *
+     * @param value
+     */
+    public void setUnderLineNormalHeight(float value) {
+        mPaintUnderLineNormal.setStrokeWidth(value);
         invalidate();
     }
 }

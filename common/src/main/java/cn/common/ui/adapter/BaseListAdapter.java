@@ -3,6 +3,8 @@ package cn.common.ui.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
@@ -23,10 +25,26 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         return mInflater;
     }
 
+    public int getColor(int id) {
+        return getContext().getResources().getColor(id);
+    }
+
+    public float getDimension(int id) {
+        return getContext().getResources().getDimension(id);
+    }
+
     public BaseListAdapter(Context context) {
+        this(context, null);
+    }
+
+    public BaseListAdapter(Context context, List<T> list) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
-        mDataList = new ArrayList<T>();
+        if (isAvailable(list)) {
+            mDataList = list;
+        } else {
+            mDataList = new ArrayList<T>();
+        }
     }
 
     public void setData(List<T> list) {
@@ -34,6 +52,18 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
             mDataList = list;
             notifyDataSetChanged();
         }
+    }
+
+    public List<T> getDataList() {
+        return mDataList;
+    }
+
+    protected boolean isAvailable(List<T> list) {
+        return list != null && list.size() > 0;
+    }
+
+    protected boolean isAvailable(T t) {
+        return t != null;
     }
 
     public void addAll(List<T> list) {
@@ -65,4 +95,11 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         return position;
     }
 
+    protected View inflate(int layoutId, ViewGroup viewGroup) {
+        return getLayoutInflater().inflate(layoutId, viewGroup);
+    }
+
+    protected View inflate(int layoutId) {
+        return inflate(layoutId, null);
+    }
 }

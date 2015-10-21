@@ -25,7 +25,7 @@ public abstract class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        mInstance = this;
+        mInstance = getChildInstance();
         mActivityMap = new HashMap<String, WeakReference<Activity>>();
         onConfig();
     }
@@ -59,7 +59,7 @@ public abstract class BaseApplication extends Application {
         android.os.Process.killProcess(Process.myPid());
         System.exit(0);
     }
-
+    protected abstract BaseApplication getChildInstance();
     public static synchronized BaseApplication getInstance() {
         return mInstance;
     }

@@ -2,6 +2,7 @@
 package cn.common.ui.widgt;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.os.Build;
 import android.util.TypedValue;
@@ -54,18 +55,28 @@ public class ChangeThemeUtils {
         try {
             Class<?>[] classes = Activity.class.getDeclaredClasses();
             Class<?> translucentConversionListenerClazz = null;
-            for (Class<?> clazz : classes) {
-                if (clazz.getSimpleName().contains("TranslucentConversionListener")) {
+            for (Class clazz : classes) {
+                if (clazz.getSimpleName().contains(
+                        "TranslucentConversionListener")) {
                     translucentConversionListenerClazz = clazz;
                 }
             }
-            Method method = Activity.class.getDeclaredMethod("convertToTranslucent",
-                    translucentConversionListenerClazz);
-            method.setAccessible(true);
-            method.invoke(activity, new Object[] {
-                    null
-            });
+            if (Build.VERSION.SDK_INT < 21) {
+                Method method = Activity.class.getDeclaredMethod(
+                        "convertToTranslucent",
+                        translucentConversionListenerClazz);
+                method.setAccessible(true);
+                method.invoke(activity, new Object[]{null});
+            } else {
+                Method method = Activity.class.getDeclaredMethod(
+                        "convertToTranslucent",
+                        translucentConversionListenerClazz,
+                        ActivityOptions.class);
+                method.setAccessible(true);
+                method.invoke(activity, new Object[]{null, null});
+            }
         } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 }
