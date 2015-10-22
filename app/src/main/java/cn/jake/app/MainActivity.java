@@ -1,36 +1,72 @@
 
 package cn.jake.app;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.TextView;
 
-public class MainActivity extends Activity {
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.common.ui.adapter.BaseListAdapter;
+
+public class MainActivity extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setListAdapter(new MyAdapter(this, getActivityList()));
+    }
+
+    private List<Info> getActivityList() {
+        List<Info> list = new ArrayList<Info>();
+        return list;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Info info = (Info) l.getAdapter().getItem(position);
+        startActivity(new Intent(this, info.clazz));
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        // noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    class Info {
+        String label;
+
+        Class<?> clazz;
+
+        public Info(String label, Class<?> clazz) {
+            this.label = label;
+            this.clazz = clazz;
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    class MyAdapter extends BaseListAdapter<Info> {
+
+        public MyAdapter(Context context, List<Info> list) {
+            super(context, list);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            TextView tv;
+            if (convertView == null) {
+                tv = new TextView(getContext());
+                tv.setPadding(0, 40, 0, 40);
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+                tv.setTextColor(Color.parseColor("#363636"));
+                convertView = tv;
+            } else {
+                tv = (TextView) convertView;
+            }
+            tv.setText(mDataList.get(position).label);
+            return convertView;
+        }
     }
 }
