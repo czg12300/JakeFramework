@@ -27,6 +27,7 @@ public class MainActivity extends ListActivity {
 
     private List<Info> getActivityList() {
         List<Info> list = new ArrayList<Info>();
+        list.add(new Info("下拉刷新", PullActivity.class));
         return list;
     }
 

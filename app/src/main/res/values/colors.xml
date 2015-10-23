@@ -2,11 +2,12 @@
 
     <color name="blue_4056fb">#4056fb</color>
     <color name="blue_14b7f3">#14b7f3</color>
-    <color name="title_background">@color/blue_14b7f3</color>
+    <color name="title_background">@color/purple_673ab7</color>
     <color name="white">#ffffff</color>
     <color name="white_f9f9f9">#f9f9f9</color>
     <color name="gray_cccccc">#cccccc</color>
     <color name="black_363636">#363636</color>
+    <color name="purple_673ab7">#673ab7</color>
     <color name="trans">#00000000</color>
 
 </resources>

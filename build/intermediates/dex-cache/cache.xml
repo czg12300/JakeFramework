@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="F:\git\github\Springs\app\build\intermediates\exploded-aar\Springs\common\unspecified\jars\classes.jar"
+        jar="F:\git\jake\JakeFramework\app\build\intermediates\exploded-aar\JakeFramework\common\unspecified\jars\classes.jar"
         jumboMode="false"
-        revision="22.0.1"
-        sha1="83e38139a58fdf72570925c5e1f747d1b235163f">
-        <dex dex="F:\git\github\Springs\app\build\intermediates\pre-dexed\debug\classes-a358c16b5911ca5df5bffc2cec12564375379d08.jar" />
+        revision="23.0.1"
+        sha1="b2dd85013843b926f026fe828e4b298fe7d4d408">
+        <dex dex="F:\git\jake\JakeFramework\app\build\intermediates\pre-dexed\debug\classes-771472f7c3be47bbeffa0b9e19ea2b5ab0ed03dc.jar" />
     </item>
 
 </items>

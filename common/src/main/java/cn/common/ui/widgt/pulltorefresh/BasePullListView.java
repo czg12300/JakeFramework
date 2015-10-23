@@ -49,6 +49,10 @@ public abstract class BasePullListView extends BasePullLayoutView {
         return mListView;
     }
 
+    public MyListView getListView() {
+        return mListView;
+    }
+
     public class MyListView extends ListView implements PullEnable {
 
         public MyListView(Context context) {
