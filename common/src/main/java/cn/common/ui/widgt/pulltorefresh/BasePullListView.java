@@ -15,9 +15,9 @@ import android.widget.ListView;
 public abstract class BasePullListView extends BasePullLayoutView {
     public MyListView mListView;
 
-    private boolean canPullUp;
+    private boolean canPullUp=true;
 
-    private boolean canPullDown;
+    private boolean canPullDown=true;
 
     public boolean isCanPullUp() {
         return canPullUp;

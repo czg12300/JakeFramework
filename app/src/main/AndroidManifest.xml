@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PullActivity"
+            android:name=".PullRefreshActivity"
             android:theme="@style/base_swipe_activity_style"
             />
     </application>

@@ -86,10 +86,12 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
                     @Override
                     public void onGlobalLayout() {
                         setPadding(getPaddingLeft(), -mFlHeader.getHeight(), getPaddingRight(),
-                                0);
-                        LayoutParams lp = (LayoutParams) mFlFooter.getLayoutParams();
-                        lp.bottomMargin = -mFlFooter.getHeight();
-                        mFlFooter.setLayoutParams(lp);
+                                -mFlFooter.getHeight());
+//                        setPadding(getPaddingLeft(), 0, getPaddingRight(),
+//                               );
+//                        LayoutParams lp = (LayoutParams) mFlFooter.getLayoutParams();
+//                        lp.bottomMargin = -mFlFooter.getHeight();
+//                        mFlFooter.setLayoutParams(lp);
                         ViewTreeObserver observer = getViewTreeObserver();
                         if (null != observer) {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -136,12 +138,12 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
                     pullDownY = (int) (deltaY / OFFSET_RADIO) - mFlHeader.getHeight();
                     setPadding(getPaddingLeft(), pullDownY, getPaddingRight(), getPaddingBottom());
                 } else if (deltaY < 0 && mPullEnable.canPullUp()) {
-                    int offset = -(int) (deltaY / OFFSET_RADIO);
+                    int offset = (int) (deltaY / OFFSET_RADIO);
                     pullUpY = offset - mFlFooter.getHeight();
-                    LayoutParams lp = (LayoutParams) mFlFooter.getLayoutParams();
-                    lp.bottomMargin = pullUpY;
-                    mFlFooter.setLayoutParams(lp);
-//                    setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), pullUpY);
+//                    LayoutParams lp = (LayoutParams) mFlFooter.getLayoutParams();
+//                    lp.bottomMargin = pullUpY;
+//                    mFlFooter.setLayoutParams(lp);
+                    setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), offset);
 //                    LayoutParams lp = new LayoutParams(-1, -1);
 //                    lp.bottomMargin = offset;
 //                    mVContent.setLayoutParams(lp);
@@ -224,6 +226,14 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
 
     public void setHeaderView(View header) {
         mFlHeader.addView(header);
+    }
+
+    public void setHeaderView(int layoutId) {
+        mFlHeader.addView(inflate(getContext(), layoutId, null));
+    }
+
+    public void setFooterView(int layoutId) {
+        mFlFooter.addView(inflate(getContext(), layoutId, null));
     }
 
     public void setFooterView(View footer) {

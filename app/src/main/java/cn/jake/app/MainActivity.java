@@ -25,11 +25,12 @@ public class MainActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setListAdapter(new MyAdapter(this, getActivityList()));
+        onListItemClick(getListView(), null, 0, 0);
     }
 
     private List<Info> getActivityList() {
         List<Info> list = new ArrayList<Info>();
-        list.add(new Info("下拉刷新", PullActivity.class));
+        list.add(new Info("下拉刷新", PullRefreshActivity.class));
         return list;
     }
 

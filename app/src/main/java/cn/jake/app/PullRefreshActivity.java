@@ -20,7 +20,7 @@ import cn.common.ui.widgt.pulltorefresh.BasePullListView;
  * @author jakechen
  * @since 2015/10/23 16:40
  */
-public class PullActivity extends CommonTitleActivity {
+public class PullRefreshActivity extends CommonTitleActivity {
 
     private PullListView mPullListView;
 
@@ -28,8 +28,10 @@ public class PullActivity extends CommonTitleActivity {
 
     @Override
     protected void initView() {
-        setTitle("下拉刷新");
+        setTitle("下拉刷新, 上拉加载");
         mPullListView = new PullListView(this);
+        mPullListView.setHeaderView(R.layout.view_header);
+        mPullListView.setFooterView(R.layout.view_footer);
         mMyAdapter = new MyAdapter(this, getData());
         setContentView(mPullListView);
         mPullListView.getListView().setAdapter(mMyAdapter);
@@ -38,7 +40,7 @@ public class PullActivity extends CommonTitleActivity {
     private List<String> getData() {
         List<String> list = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
-            list.add("加快该撒娇干撒");
+            list.add("测试数据");
         }
         return list;
     }
