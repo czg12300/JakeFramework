@@ -3,19 +3,15 @@ package cn.common.ui.widgt.pulltorefresh;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-
-import java.util.Timer;
-import java.util.TimerTask;
+import android.widget.Scroller;
 
 /**
  * description：base of pull layout view
@@ -23,7 +19,7 @@ import java.util.TimerTask;
  * @author jakechen
  * @since 2015/9/16 18:11
  */
-public abstract class BasePullLayoutView extends RelativeLayout implements Handler.Callback {
+public abstract class BasePullLayoutView extends LinearLayout {
     private final static float OFFSET_RADIO = 1.8f;
 
     private static final int MSG_HEADER = 0;
@@ -34,9 +30,14 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
 
     private static final int MSG_FOOTER_LOAD = 3;
 
-    private FrameLayout mFlHeader;
+    private static final int SCROLL_BACK_HEADER = 0;
 
-    private FrameLayout mFlFooter;
+    private static final int SCROLL_BACK_FOOTER = 1;
+
+    private FrameLayout mHeader;
+
+    private FrameLayout mFooter;
+
     private View mVContent;
 
     private PullEnable mPullEnable;
@@ -45,13 +46,17 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
 
     private PullListener mPullListener;
 
-    private Timer mTimer;
+    private Scroller mScroller;
 
-    private Handler mHandler = new Handler(this);
+    private int mScrollBack;
 
-    private int spitH;
+    private int mHeaderHeight;
 
-    private int spitF;
+    private int mFooterHeight;
+
+    private int pullDownY;
+
+    private int pullUpY;
 
     public BasePullLayoutView(Context context) {
         this(context, null);
@@ -59,39 +64,30 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
 
     public BasePullLayoutView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mTimer = new Timer();
-        mFlHeader = new FrameLayout(context);
-        mFlHeader.setId(1234);
-        mFlFooter = new FrameLayout(context);
-        mFlFooter.setId(1235);
-        LayoutParams rl = new LayoutParams(-1, -2);
-        rl.addRule(ALIGN_PARENT_TOP);
-        addView(mFlHeader, rl);
+        setOrientation(VERTICAL);
+        mScroller = new Scroller(context, new DecelerateInterpolator());
+        mHeader = new FrameLayout(context);
+        mFooter = new FrameLayout(context);
+        addView(mHeader, new LayoutParams(-1, -2));
         mVContent = getContentView();
         if (mVContent instanceof PullEnable) {
             mPullEnable = (PullEnable) mVContent;
         } else {
             throw new IllegalArgumentException("content view is not instance of PullEnable");
         }
-        rl = new LayoutParams(-1, -2);
-        rl.addRule(ALIGN_PARENT_BOTTOM);
-        addView(mFlFooter, rl);
-        rl = new LayoutParams(-1, -1);
-        rl.addRule(BELOW, mFlHeader.getId());
-        rl.addRule(ABOVE, mFlFooter.getId());
-        addView(mVContent, rl);
+        LayoutParams lp = new LayoutParams(-1, 0);
+        lp.weight = 1;
+        addView(mVContent, lp);
+        addView(mFooter, new LayoutParams(-1, -2));
         getViewTreeObserver()
                 .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
                     @Override
                     public void onGlobalLayout() {
-                        setPadding(getPaddingLeft(), -mFlHeader.getHeight(), getPaddingRight(),
-                                -mFlFooter.getHeight());
-//                        setPadding(getPaddingLeft(), 0, getPaddingRight(),
-//                               );
-//                        LayoutParams lp = (LayoutParams) mFlFooter.getLayoutParams();
-//                        lp.bottomMargin = -mFlFooter.getHeight();
-//                        mFlFooter.setLayoutParams(lp);
+                        mHeaderHeight = mHeader.getHeight();
+                        mFooterHeight = mFooter.getHeight();
+                        setHeaderTopMargin(-mHeaderHeight);
+                        setFooterBottomMargin(-mFooterHeight);
                         ViewTreeObserver observer = getViewTreeObserver();
                         if (null != observer) {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -102,6 +98,12 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
                         }
                     }
                 });
+    }
+
+    protected void onPullDown(View header, float radio, boolean isSliding) {
+    }
+
+    protected void onPullUp(View header, float radio, boolean isSliding) {
     }
 
     @Override
@@ -122,12 +124,8 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
 
     }
 
-    private int pullDownY;
-
-    private int pullUpY;
-
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
+    public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mLastY = ev.getRawY();
@@ -135,109 +133,117 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
             case MotionEvent.ACTION_MOVE:
                 final float deltaY = ev.getRawY() - mLastY;
                 if (deltaY > 0 && mPullEnable.canPullDown()) {
-                    pullDownY = (int) (deltaY / OFFSET_RADIO) - mFlHeader.getHeight();
-                    setPadding(getPaddingLeft(), pullDownY, getPaddingRight(), getPaddingBottom());
+                    pullDownY = (int) (deltaY / OFFSET_RADIO) - mHeader.getHeight();
+                    handlePullDownAnimation(true);
+                    setHeaderTopMargin(pullDownY);
+                    setFooterBottomMargin(-mFooterHeight);
+                    pullUpY = 0;
                 } else if (deltaY < 0 && mPullEnable.canPullUp()) {
-                    int offset = (int) (deltaY / OFFSET_RADIO);
-                    pullUpY = offset - mFlFooter.getHeight();
-//                    LayoutParams lp = (LayoutParams) mFlFooter.getLayoutParams();
-//                    lp.bottomMargin = pullUpY;
-//                    mFlFooter.setLayoutParams(lp);
-                    setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), offset);
-//                    LayoutParams lp = new LayoutParams(-1, -1);
-//                    lp.bottomMargin = offset;
-//                    mVContent.setLayoutParams(lp);
+                    int offset = -(int) (deltaY / OFFSET_RADIO);
+                    pullUpY = offset - mFooter.getHeight();
+                    handlePullUpAnimation(true);
+                    setFooterBottomMargin(pullUpY);
+                    setHeaderTopMargin(-mHeaderHeight);
+                    pullDownY = 0;
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                reset();
+                Log.d("tag", "pullUpY =" + pullUpY + "  mFooterHeight=" + mFooterHeight
+                        + "   pullDownY=" + pullDownY + " mHeaderHeight=" + mHeaderHeight);
+                if (pullUpY == 0 && mPullEnable.canPullDown()) {
+                    mScrollBack = SCROLL_BACK_HEADER;
+                    if (pullDownY >= mHeaderHeight) {
+                        mScroller.startScroll(0, pullDownY, 0, 0 - pullDownY);
+                    } else {
+                        if (pullDownY > 0) {
+                            mScroller.startScroll(0, pullDownY, pullDownY + mHeaderHeight, 0);
+                        } else {
+                            mScroller.startScroll(0, -pullDownY, mHeaderHeight + pullDownY, 0);
+                        }
+                    }
+                }
+                if (pullDownY == 0 && mPullEnable.canPullUp()) {
+                    mScrollBack = SCROLL_BACK_FOOTER;
+                    if (pullUpY >= mFooterHeight) {
+                        mScroller.startScroll(0, pullUpY, 0, 0 - pullUpY);
+                    } else {
+                        if (pullUpY > 0) {
+                            mScroller.startScroll(0, pullUpY, pullUpY + mFooterHeight, 0);
+                        } else {
+                            mScroller.startScroll(0, -pullUpY, mFooterHeight + pullUpY, 0);
+                        }
+                    }
+                }
+                handlePullDownAnimation(false);
+                handlePullUpAnimation(false);
+                invalidate();
                 break;
         }
-        return true;
+        return super.dispatchTouchEvent(ev);
     }
 
-    private void reset() {
-        if (getPaddingTop() > 0) {
-            hideHeader(true);
-            handleRefreshing(mFlHeader);
-        } else if (getPaddingTop() < 0 && getPaddingTop() > -mFlHeader.getHeight()) {
-            hideHeader(false);
+    private void handlePullUpAnimation(boolean isSliding) {
+        if (pullUpY < 0) {
+            onPullUp(mFooter, Math.abs((float) pullUpY / (float) mFooterHeight), isSliding);
+        } else {
+            onPullUp(mFooter, 1, isSliding);
         }
-        if (getPaddingBottom() > 0) {
-            hideFooter(true);
-            handleLoading(mFlFooter);
-        } else if (getPaddingBottom() < 0 && getPaddingBottom() > -mFlFooter.getHeight()) {
-            hideFooter(false);
+    }
+
+    private void handlePullDownAnimation(boolean isSliding) {
+        if (pullDownY < 0) {
+            onPullDown(mHeader, Math.abs((float) pullDownY / (float) mHeaderHeight), isSliding);
+        } else {
+            onPullDown(mHeader, 1, isSliding);
         }
-
     }
 
-    private void hideHeader(final boolean isToRefresh) {
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (isToRefresh) {
-                    if (getPaddingTop() > 0) {
-                        mHandler.sendEmptyMessage(MSG_HEADER_REFRESH);
-                    } else {
-                        cancel();
-                    }
-                } else {
-                    if (getPaddingTop() > -mFlHeader.getHeight()) {
-                        mHandler.sendEmptyMessage(MSG_HEADER);
-                    } else {
-                        cancel();
-                    }
-                }
-            }
-        }, 0, 5);
+    /**
+     * 设置头部的滑动
+     *
+     * @param marginTop
+     */
+    private void setHeaderTopMargin(int marginTop) {
+        LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
+        lp.topMargin = marginTop;
+        mHeader.setLayoutParams(lp);
+        requestLayout();
     }
 
-    private void hideFooter(final boolean isToLoad) {
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (isToLoad) {
-                    if (getPaddingBottom() > 0) {
-                        mHandler.sendEmptyMessage(MSG_FOOTER_LOAD);
-                    } else {
-                        cancel();
-                    }
-                } else {
-                    if (getPaddingBottom() > -mFlFooter.getHeight()) {
-                        mHandler.sendEmptyMessage(MSG_FOOTER);
-                    } else {
-                        cancel();
-                    }
-                }
-            }
-        }, 0, 5);
+    /**
+     * 设置底部的滑动
+     *
+     * @param marginBottom
+     */
+    private void setFooterBottomMargin(int marginBottom) {
+        LayoutParams lp = (LayoutParams) mFooter.getLayoutParams();
+        lp.bottomMargin = marginBottom;
+        mFooter.setLayoutParams(lp);
+        requestLayout();
     }
 
-    protected abstract void handleRefreshing(View header);
-
-    protected abstract void handleLoading(View footer);
-
-    protected void handleRefreshAnimation(View header) {
+    private int getHeaderTopMargin() {
+        return ((LayoutParams) mHeader.getLayoutParams()).topMargin;
     }
 
-    protected void handleLoadAnimation(View footer) {
+    private int getFooterBottomMargin() {
+        return ((LayoutParams) mFooter.getLayoutParams()).bottomMargin;
     }
 
     public void setHeaderView(View header) {
-        mFlHeader.addView(header);
+        mHeader.addView(header);
     }
 
     public void setHeaderView(int layoutId) {
-        mFlHeader.addView(inflate(getContext(), layoutId, null));
+        mHeader.addView(inflate(getContext(), layoutId, null));
     }
 
     public void setFooterView(int layoutId) {
-        mFlFooter.addView(inflate(getContext(), layoutId, null));
+        mFooter.addView(inflate(getContext(), layoutId, null));
     }
 
     public void setFooterView(View footer) {
-        mFlFooter.addView(footer);
+        mFooter.addView(footer);
     }
 
     protected abstract View getContentView();
@@ -251,35 +257,26 @@ public abstract class BasePullLayoutView extends RelativeLayout implements Handl
     }
 
     @Override
-    public boolean handleMessage(Message msg) {
-        spitH = (int) (8 + 5
-                * Math.tan(Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullDownY))));
-        spitF = (int) (8
-                + 5 * Math.tan(Math.PI / 2 / getMeasuredHeight() * (pullUpY + Math.abs(pullUpY))));
-        int offsetH = getPaddingTop() - spitH;
-        int offsetF = getPaddingBottom() - spitF;
-        switch (msg.what) {
-            case MSG_HEADER_REFRESH:
-                if (offsetH > 0) {
-                    setPadding(getPaddingLeft(), offsetH, getPaddingRight(), getPaddingBottom());
+    public void computeScroll() {
+        Log.d("tag", "mScroller.getCurrY()=" + mScroller.getCurrY());
+        if (mScroller.computeScrollOffset()) {
+            if (mScrollBack == SCROLL_BACK_HEADER) {
+                if (pullDownY < mHeaderHeight) {
+                    int total = Math.abs(mHeaderHeight - pullDownY);
+                    setHeaderTopMargin(-(total - mScroller.getCurrY()));
                 } else {
-                    setPadding(getPaddingLeft(), 0, getPaddingRight(), getPaddingBottom());
+                    setHeaderTopMargin(mScroller.getCurrY());
                 }
-                break;
-            case MSG_HEADER:
-                setPadding(getPaddingLeft(), offsetH, getPaddingRight(), getPaddingBottom());
-                break;
-            case MSG_FOOTER_LOAD:
-                if (offsetF > 0) {
-                    setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), offsetF);
+            } else {
+                if (pullUpY < mFooterHeight) {
+                    int total = Math.abs(mFooterHeight - pullUpY);
+                    setFooterBottomMargin(-(total - mScroller.getCurrY()));
                 } else {
-                    setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), offsetF);
+                    setFooterBottomMargin(mScroller.getCurrY());
                 }
-                break;
-            case MSG_FOOTER:
-                setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), offsetF);
-                break;
+            }
+            postInvalidate();
         }
-        return true;
+        super.computeScroll();
     }
 }

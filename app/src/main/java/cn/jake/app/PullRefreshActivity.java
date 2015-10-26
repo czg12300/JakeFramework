@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class PullRefreshActivity extends CommonTitleActivity {
     protected void initView() {
         setTitle("下拉刷新, 上拉加载");
         mPullListView = new PullListView(this);
+        mPullListView.setLayoutParams(new RelativeLayout.LayoutParams(-1, -1));
         mPullListView.setHeaderView(R.layout.view_header);
         mPullListView.setFooterView(R.layout.view_footer);
         mMyAdapter = new MyAdapter(this, getData());
@@ -50,13 +52,6 @@ public class PullRefreshActivity extends CommonTitleActivity {
             super(context);
         }
 
-        @Override
-        protected void handleRefreshing(View header) {
-        }
-
-        @Override
-        protected void handleLoading(View footer) {
-        }
     }
 
     private class MyAdapter extends BaseListAdapter<String> {

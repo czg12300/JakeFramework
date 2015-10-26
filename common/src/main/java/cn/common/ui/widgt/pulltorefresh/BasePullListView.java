@@ -6,18 +6,20 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ListView;
 
+import cn.common.ui.widgt.pull.PullToRefreshLayout;
+
 /**
  * 描述:
  *
  * @author jakechen
  * @since 2015/9/17 17:17
  */
-public abstract class BasePullListView extends BasePullLayoutView {
+public abstract class BasePullListView extends PullToRefreshLayout {
     public MyListView mListView;
 
-    private boolean canPullUp=true;
+    private boolean canPullUp = true;
 
-    private boolean canPullDown=true;
+    private boolean canPullDown = true;
 
     public boolean isCanPullUp() {
         return canPullUp;
