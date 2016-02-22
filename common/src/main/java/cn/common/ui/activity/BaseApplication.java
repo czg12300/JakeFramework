@@ -3,6 +3,7 @@ package cn.common.ui.activity;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Process;
 
 import java.lang.ref.WeakReference;
@@ -58,6 +59,9 @@ public abstract class BaseApplication extends Application {
         mActivityMap.clear();
         android.os.Process.killProcess(Process.myPid());
         System.exit(0);
+    }
+    public Context getContext() {
+        return getApplicationContext();
     }
     protected abstract BaseApplication getChildInstance();
     public static synchronized BaseApplication getInstance() {

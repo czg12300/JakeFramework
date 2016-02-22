@@ -48,8 +48,6 @@ public abstract class BaseFragment extends Fragment implements IUi {
                 mActivityReference.get().handleUiMessage(msg);
             }
         }
-
-        ;
     }
 
     private ArrayList<String> mActions;
@@ -201,9 +199,14 @@ public abstract class BaseFragment extends Fragment implements IUi {
             Bundle savedInstanceState) {
         mDecorView = new FrameLayout(getActivity());
         mSavedInstanceState = savedInstanceState;
+        return mDecorView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         initView();
         initEvent();
-        return mDecorView;
     }
 
     protected View findViewById(int id) {

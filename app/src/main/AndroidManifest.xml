@@ -19,7 +19,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PullRefreshActivity"
+            android:name=".DemoPullRefreshActivity"
+            android:theme="@style/base_swipe_activity_style"
+            />
+        <activity
+            android:name=".DemoChatListActivity"
             android:theme="@style/base_swipe_activity_style"
             />
     </application>

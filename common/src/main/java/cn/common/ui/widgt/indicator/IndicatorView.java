@@ -11,76 +11,116 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.common.utils.DisplayUtil;
+
 /**
  * has under line's tab
  *
  * @author jake
  */
-public class IndicatorView extends LinearLayout
-        implements View.OnClickListener, OnFocusChangeListener {
+public class IndicatorView extends FrameLayout implements View.OnClickListener {
+    class LineView extends View {
+        private Paint selectPaint = new Paint();
 
-    private int mSelectTabColor;
+        private Paint normalPaint = new Paint();
+        private float xSelectLeft;
+        private float xSelectRight;
+        private int normalColor;
+        private int selectColor;
+        private boolean showNormal;
+        private int normalHeight;
 
-    /**
-     * position under line srcoll location
-     */
+        public LineView(Context context) {
+            super(context);
+            selectPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            normalPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        }
+
+        public void setNormalColor(int color) {
+            normalColor = color;
+        }
+
+        public void setSelectColor(int color) {
+            selectColor = color;
+        }
+
+        public void update(float xLeft, float xRight) {
+            xSelectLeft = xLeft;
+            xSelectRight = xRight;
+            invalidate();
+        }
+
+        public void setShowNormal(boolean showNormal) {
+            this.showNormal = showNormal;
+        }
+
+        public void setNormalHeight(int height) {
+            normalHeight = height;
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            if (normalHeight == 0) {
+                normalHeight = 1;
+            }
+            selectPaint.setStrokeWidth(getHeight());
+            selectPaint.setColor(selectColor);
+            normalPaint.setColor(normalColor);
+            selectPaint.setStrokeWidth(normalHeight);
+            if (showNormal) {
+                if (normalHeight > getHeight()) {
+                    normalHeight = getHeight();
+                }
+                Path path = new Path();
+                path.moveTo(0, getHeight() - normalHeight);
+                path.lineTo(getWidth(), getHeight() - normalHeight);
+                path.lineTo(getWidth(), getHeight());
+                path.lineTo(0, getHeight());
+                path.lineTo(0, getHeight() - normalHeight);
+                canvas.drawPath(path, normalPaint);
+            }
+            Path path = new Path();
+            path.moveTo(xSelectLeft, 0);
+            path.lineTo(xSelectRight, 0);
+            path.lineTo(xSelectRight, getHeight());
+            path.lineTo(xSelectLeft, getHeight());
+            path.lineTo(xSelectLeft, 0);
+            canvas.drawPath(path, selectPaint);
+        }
+    }
+
+    private int tabSelectColor;
+
     private int mCurrentScroll = 0;
-
-    /**
-     * tab list
-     */
     private List<String> mTabs;
+    private ViewPager viewPager;
+    private int textColor;
 
-    /**
-     * depend on viewpager
-     */
-    private ViewPager mViewPager;
-
-    /**
-     * tab text color
-     */
-    private int mTextColor;
-
-    private float mTextSize;
+    private float textSize;
 
     private int mSelectedTab = 0;
 
     private final int BSSEEID = 0xffff0;
-    ;
 
     private int mCurrID = 0;
 
-    private int mPerItemWidth = 0;
 
     private boolean isChangeTabColor = false;
 
     private List<TextView> tvTitles;
-
-    /**
-     * under line paint
-     */
-    private Paint mPaintUnderLineSelected;
-
-    private Paint mPaintUnderLineNormal;
-
-    /***
-     * under lint path
-     */
-    private Path mPathNormal;
-
-    private Path mPathSelected;
-
-    /**
-     * is under lint average with tab
-     */
-    private boolean mIsAverage = true;
+    private boolean isAverage = true;
+    //是否显示正常的线
+    private LinearLayout tabLayout;
+    private LineView lineView;
+    private boolean isUpdataLine = true;
 
     public IndicatorView(Context context) {
         this(context, null);
@@ -89,202 +129,84 @@ public class IndicatorView extends LinearLayout
 
     public IndicatorView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setFocusable(true);
-        setOnFocusChangeListener(this);
-        mSelectTabColor = Color.parseColor("#cccccc");
-        mTextColor = Color.parseColor("#363636");
-        initDraw(mSelectTabColor);
-        tvTitles = new ArrayList<TextView>();
+        tabSelectColor = Color.parseColor("#cccccc");
+        textColor = Color.parseColor("#363636");
+        tvTitles = new ArrayList<>();
+        tabLayout = new LinearLayout(context);
+        tabLayout.setOrientation(LinearLayout.HORIZONTAL);
+        lineView = new LineView(context);
+        addView(tabLayout, new LayoutParams(-1, -1));
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(-1, -2);
+        params.gravity = Gravity.BOTTOM;
+        params.height = 2;
+        addView(lineView, params);
     }
 
-    /**
-     * Initialize draw objects
-     */
-    private void initDraw(int underLineColor) {
-        mPaintUnderLineSelected = new Paint();
-        mPaintUnderLineSelected.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaintUnderLineSelected.setStrokeWidth(dip(1.5f));
-        mPaintUnderLineSelected.setColor(underLineColor);
-        mPaintUnderLineNormal = new Paint();
-        mPaintUnderLineNormal.setColor(underLineColor);
-        mPaintUnderLineNormal.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaintUnderLineNormal.setStrokeWidth(1);
-        mPathNormal = new Path();
-        mPathSelected = new Path();
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    private void updateLine() {
+        int width = getWidth() - getPaddingLeft() - getPaddingRight();
         float xScroll = 0;
+        int selectLineWidth = width;
         if (mTabs != null && mTabs.size() != 0) {
-            mPerItemWidth = getWidth() / mTabs.size();
+            selectLineWidth = width / mTabs.size();
             int tabID = mSelectedTab;
-            xScroll = (mCurrentScroll - ((tabID) * (getWidth() + mViewPager.getPageMargin())))
+            xScroll = (mCurrentScroll - ((tabID) * (getWidth() + viewPager.getPageMargin())))
                     / mTabs.size();
-        } else {
-            mPerItemWidth = getWidth();
-            xScroll = mCurrentScroll;
         }
         if (tvTitles.size() > 1) {
-            float xLeft = 0;
-            float xRight = 0;
-            xLeft = mSelectedTab * mPerItemWidth + xScroll;
-            xRight = (mSelectedTab + 1) * mPerItemWidth + xScroll;
-            if (!mIsAverage) {
+            float xLeft = mSelectedTab * selectLineWidth + xScroll;
+            float xRight = (mSelectedTab + 1) * selectLineWidth + xScroll;
+            if (!isAverage) {
                 TextView tvTitle = tvTitles.get(mSelectedTab);
                 float tabTextWidth = tvTitle.getPaint().measureText(tvTitle.getText().toString());
                 float tabWidth = xRight - xLeft;
-                // math text to view padding
                 float scanx = (tabWidth - tabTextWidth) / 2;
                 xLeft += scanx;
                 xRight -= scanx;
             }
-            mPathNormal.reset();
-            mPathSelected.reset();
-            mPathNormal.moveTo(0, getHeight() - mPaintUnderLineNormal.getStrokeWidth() / 2);
-            mPathNormal.lineTo(getWidth(), getHeight() - mPaintUnderLineNormal.getStrokeWidth() / 2);
-            mPathSelected.moveTo(xLeft, getHeight() - mPaintUnderLineSelected.getStrokeWidth() / 2 - mPaintUnderLineNormal.getStrokeWidth());
-            mPathSelected.lineTo(xRight, getHeight() - mPaintUnderLineSelected.getStrokeWidth() / 2 - mPaintUnderLineNormal.getStrokeWidth());
-            canvas.drawPath(mPathNormal, mPaintUnderLineNormal);
-            canvas.drawPath(mPathSelected, mPaintUnderLineSelected);
+
+            if (lineView != null) {
+                lineView.update(xLeft- DisplayUtil.dip(5), xRight+DisplayUtil.dip(5));
+            }
         }
     }
 
-    public void onScrolled(int scroll) {
-        mCurrentScroll = scroll;
-        invalidate();
-    }
 
-    public synchronized void onSwitched(int position) {
-        if (mSelectedTab == position) {
-            return;
-        }
-        setCurrentTab(position);
-        invalidate();
-    }
-
-    public void init(int startPos, List<String> tabs, ViewPager viewPager) {
-        mViewPager = viewPager;
-        mTabs = tabs;
-        for (int i = 0; i < tabs.size(); i++) {
-            add(tabs.get(i));
-        }
-        setCurrentTab(startPos);
-        invalidate();
-    }
-
-    public void setTabs(List<String> tabs) {
-        removeAllViews();
-        tvTitles.clear();
-        mCurrID = 0;
-        mTabs = tabs;
-        for (int i = 0; i < tabs.size(); i++) {
-            add(tabs.get(i));
-        }
-        if (mSelectedTab >= tabs.size()) {
-            mSelectedTab = 0;
-        }
-        invalidate();
-    }
-
-    protected void add(String label) {
+    private TextView createTab(String label) {
         TextView tvTitle = new TextView(getContext());
-        tvTitle.setTextColor(mTextColor);
+        tvTitle.setTextColor(textColor);
         tvTitle.setGravity(Gravity.CENTER);
-        if (mTextSize > 0) {
-            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+        if (textSize > 0) {
+            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         }
         tvTitle.setText(label);
         tvTitle.setId(BSSEEID + (mCurrID++));
         tvTitle.setOnClickListener(this);
-        LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -1);
         lp.weight = 1;
         lp.gravity = Gravity.CENTER_VERTICAL;
-        addView(tvTitle, lp);
+        tvTitle.setLayoutParams(lp);
         tvTitles.add(tvTitle);
+        return tvTitle;
     }
 
     @Override
     public void onClick(View v) {
         int position = v.getId() - BSSEEID;
-        setCurrentTab(position);
+        onPageSelected(position);
     }
 
-    public int getTabCount() {
-        int children = getChildCount();
-        return children;
-    }
-
-    public synchronized void setCurrentTab(int index) {
-        if (index < 0 || index >= getTabCount()) {
-            return;
-        }
-        View oldTab = getChildAt(mSelectedTab);
-        oldTab.setSelected(false);
-        setTabTextColor(oldTab, false);
-        mSelectedTab = index;
-        View newTab = getChildAt(mSelectedTab);
-        newTab.setSelected(true);
-        setTabTextColor(newTab, true);
-        mViewPager.setCurrentItem(mSelectedTab, false);
-        invalidate();
-    }
-
-    private void setTabTextColor(View tab, boolean selected) {
-        TextView tv = (TextView) tab;
-        tv.setTextColor(selected ? mSelectTabColor : mTextColor);
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (v == this && hasFocus && getTabCount() > 0) {
-            getChildAt(mSelectedTab).requestFocus();
-            return;
-        }
-        if (hasFocus) {
-            int i = 0;
-            int numTabs = getTabCount();
-            while (i < numTabs) {
-                if (getChildAt(i) == v) {
-                    setCurrentTab(i);
-                    break;
-                }
-                i++;
-            }
-        }
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-        if (mCurrentScroll == 0 && mSelectedTab != 0) {
-            mCurrentScroll = (getWidth() + mViewPager.getPageMargin()) * mSelectedTab;
-        }
-    }
-
-    private float dip(float dip) {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip,
-                getResources().getDisplayMetrics());
-    }
-
-    public boolean isAverage() {
-        return mIsAverage;
-    }
 
     public void setAverage(boolean isAverage) {
-        mIsAverage = isAverage;
+        this.isAverage = isAverage;
     }
 
     public void setTabSelectColor(int color) {
-        mPaintUnderLineSelected.setColor(color);
-        mSelectTabColor = color;
-        invalidate();
+        tabSelectColor = color;
+        lineView.setSelectColor(color);
     }
 
-    public void setUnderLineColor(int color) {
-        mPaintUnderLineNormal.setColor(color);
-        invalidate();
+    public void setLineColor(int color) {
+        lineView.setNormalColor(color);
     }
 
     public boolean isChangeTabColor() {
@@ -293,46 +215,79 @@ public class IndicatorView extends LinearLayout
 
     public void setChangeTabColor(boolean isChangeTabColor) {
         this.isChangeTabColor = isChangeTabColor;
-        if (isChangeTabColor) {
-            setCurrentTab(mSelectedTab);
-
-        }
     }
 
-    /**
-     * set tab text color
-     */
     public void setTextColor(int textColor) {
-        mTextColor = textColor;
-        invalidate();
+        this.textColor = textColor;
     }
 
-    /**
-     * set tab text size
-     *
-     * @param textSize
-     */
     public void setTextSize(float textSize) {
-        mTextSize = textSize;
+        this.textSize = textSize;
     }
 
-    /**
-     * set under line height
-     *
-     * @param footerLineHeight
-     */
-    public void setUnderLineHeight(float footerLineHeight) {
-        mPaintUnderLineSelected.setStrokeWidth(footerLineHeight);
-        invalidate();
+    public void setSelectLineHeight(int selectLineHeight) {
+        FrameLayout.LayoutParams params = (LayoutParams) lineView.getLayoutParams();
+        params.height = selectLineHeight;
+        lineView.setLayoutParams(params);
     }
 
-    /**
-     * set under line normal height
-     *
-     * @param value
-     */
-    public void setUnderLineNormalHeight(float value) {
-        mPaintUnderLineNormal.setStrokeWidth(value);
-        invalidate();
+    public void setNormalLineHeight(int normalLineHeight) {
+        lineView.setNormalHeight(normalLineHeight);
+    }
+
+
+    public void setShowNormalLine(boolean show) {
+        lineView.setShowNormal(show);
+    }
+
+    public void setLineMarginBottom(float lineMarginBottom) {
+        FrameLayout.LayoutParams params = (LayoutParams) lineView.getLayoutParams();
+        params.bottomMargin = (int) lineMarginBottom;
+        lineView.setLayoutParams(params);
+    }
+
+    public void onPageScrolled(int scroll) {
+        mCurrentScroll = scroll;
+        updateLine();
+    }
+
+    public synchronized void onPageSelected(int position) {
+        if (position < 0 || position >= getTabCount()) {
+            return;
+        }
+        View oldTab = tabLayout.getChildAt(mSelectedTab);
+        oldTab.setSelected(false);
+        ((TextView) oldTab).setTextColor(textColor);
+        mSelectedTab = position;
+        View newTab = tabLayout.getChildAt(mSelectedTab);
+        newTab.setSelected(true);
+        ((TextView) newTab).setTextColor(tabSelectColor);
+        viewPager.setCurrentItem(mSelectedTab, false);
+        updateLine();
+    }
+
+
+    public void setViewPager(ViewPager viewPager) {
+        this.viewPager = viewPager;
+    }
+
+    public void setTabList(List<String> tabs) {
+        tvTitles.clear();
+        mCurrID = 0;
+        mTabs = tabs;
+        for (int i = 0; i < tabs.size(); i++) {
+            tabLayout.addView(createTab(tabs.get(i)));
+        }
+        tabLayout.requestLayout();
+        requestLayout();
+        if (mSelectedTab >= tabs.size()) {
+            mSelectedTab = 0;
+        }
+        onPageSelected(0);
+    }
+
+    private int getTabCount() {
+        int children = getChildCount();
+        return children;
     }
 }

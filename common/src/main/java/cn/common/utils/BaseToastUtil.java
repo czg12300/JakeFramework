@@ -27,7 +27,7 @@ public class BaseToastUtil {
             return;
         }
         if (!TextUtils.equals(msg, mMsg)) {
-            mToast = Toast.makeText(BaseApplication.getInstance(), msg, Toast.LENGTH_SHORT);
+            mToast = Toast.makeText(BaseApplication.getInstance().getContext(), msg, Toast.LENGTH_SHORT);
             mMsg = msg;
         }
         mToast.show();

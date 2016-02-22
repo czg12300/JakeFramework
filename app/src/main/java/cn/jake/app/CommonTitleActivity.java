@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import cn.common.ui.activity.BaseTitleActivity;
+import cn.common.ui.widgt.ChangeThemeUtils;
 import cn.common.utils.CommonUtil;
 
 /**
@@ -39,6 +40,7 @@ public abstract class CommonTitleActivity extends BaseTitleActivity {
             }
         });
         setBackgroundColor(Color.parseColor("#f9f9f9"));
+        ChangeThemeUtils.adjustStatusBar(mVTitle, this);
         return mVTitle;
     }
 

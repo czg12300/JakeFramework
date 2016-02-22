@@ -102,6 +102,10 @@ public class PopupWindowHelper {
         popupView.measure(pw.getWidth(), height);
         pw.setHeight(height);
     }
+    public void setWidth(int width) {
+        popupView.measure(width, pw.getHeight());
+        pw.setWidth(width);
+    }
 
     /**
      * 设置是否点击外部消失
@@ -164,5 +168,9 @@ public class PopupWindowHelper {
 
     public View getView() {
         return popupView;
+    }
+
+    public void setOnDismissListener(PopupWindow.OnDismissListener listener) {
+        pw.setOnDismissListener(listener);
     }
 }

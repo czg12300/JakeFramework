@@ -30,6 +30,7 @@ import java.util.Set;
 
 import cn.common.config.BaseAppConFig;
 import cn.common.exception.AppException;
+import cn.common.utils.LogUtil;
 import cn.common.utils.UrlEncodeUtil;
 
 /**
@@ -50,7 +51,7 @@ public abstract class BaseHttpClientRequest<T> {
 
     private String mSvc;
 
-    private Hashtable<String, String> mParams;
+    protected Hashtable<String, String> mParams;
 
     private Class<?> mClazz;
 
@@ -132,8 +133,9 @@ public abstract class BaseHttpClientRequest<T> {
                         && statusCode != HttpStatus.SC_PARTIAL_CONTENT) {
                     throw AppException.http(statusCode);
                 }
-                String result = EntityUtils
-                        .toString(new BufferedHttpEntity(httpResponse.getEntity()), HTTP.UTF_8);
+                String result = EntityUtils.toString(
+                        new BufferedHttpEntity(httpResponse.getEntity()), HTTP.UTF_8);
+                LogUtil.d("response", result);
                 if (mClazz != null) {
                     BaseResponse response = (BaseResponse) mClazz.newInstance();
                     if (response != null) {
@@ -210,6 +212,7 @@ public abstract class BaseHttpClientRequest<T> {
         }
         uriReq.setHeader("Connection", "Keep-Alive");
         uriReq.setHeader("User-Agent", getUserAgent());
+        LogUtil.d("request", uriReq.getURI().toString());
         return uriReq;
     }
 
@@ -230,10 +233,10 @@ public abstract class BaseHttpClientRequest<T> {
         return entity;
     }
 
-    private String getGetRequestParams() {
+    protected String getGetRequestParams() {
         if (mParams != null && mParams.size() >= 0) {
             StringBuilder builder = new StringBuilder();
-            builder.append("&");
+            builder.append("?");
             final Set<String> keys = mParams.keySet();
             for (String key : keys) {
                 builder.append(key).append("=").append(mParams.get(key)).append("&");

@@ -1,0 +1,89 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="-60dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_refresh_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下拉刷新"
+            android:textColor="#333333"
+            android:textSize="14dp" />
+
+        <FrameLayout
+            android:id="@+id/fl_refresh_animation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/tv_refresh_tip">
+
+            <ImageView
+                android:id="@+id/iv_refresh_arrow"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/xlistview_arrow"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/pb_refresh_loading"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rl_load_more"
+        android:layout_below="@+id/rl_refresh" />
+
+    <RelativeLayout
+        android:id="@+id/rl_load_more"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="-60dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_load_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下拉刷新"
+            android:textColor="#333333"
+            android:textSize="14dp" />
+
+        <FrameLayout
+            android:id="@+id/fl_load_animation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@+id/tv_load_tip">
+
+            <ImageView
+                android:id="@+id/iv_load_arrow"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/xlistview_arrow"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/pb_load_loading"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </RelativeLayout>
+</merge>
