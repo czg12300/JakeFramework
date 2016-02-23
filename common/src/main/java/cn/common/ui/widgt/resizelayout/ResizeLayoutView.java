@@ -10,7 +10,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import java.lang.reflect.Field;
@@ -25,6 +24,12 @@ public class ResizeLayoutView extends RelativeLayout implements
         ViewTreeObserver.OnGlobalLayoutListener {
     private Activity activity;
 
+    private View mActivityContentView;
+
+    private int usableHeightPrevious;
+
+    private int height = 0;
+
     public ResizeLayoutView(Context context) {
         this(context, null);
     }
@@ -36,27 +41,20 @@ public class ResizeLayoutView extends RelativeLayout implements
     public ResizeLayoutView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         activity = ((Activity) context);
-        FrameLayout content = (FrameLayout) activity.findViewById(android.R.id.content);
-        mChildOfContent = content.getChildAt(0);
+        mActivityContentView = activity.findViewById(android.R.id.content);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mChildOfContent.getViewTreeObserver().addOnGlobalLayoutListener(this);
+        mActivityContentView.getViewTreeObserver().addOnGlobalLayoutListener(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mChildOfContent.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+        mActivityContentView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
     }
-
-    private View mChildOfContent;
-
-    private int usableHeightPrevious;
-
-    private int height = 0;
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -69,7 +67,7 @@ public class ResizeLayoutView extends RelativeLayout implements
     private void possiblyResizeChildOfContent() {
         int usableHeightNow = computeUsableHeight();
         if (usableHeightNow != usableHeightPrevious) {
-            int usableHeightSansKeyboard = mChildOfContent.getRootView().getHeight();
+            int usableHeightSansKeyboard = mActivityContentView.getRootView().getHeight();
             int heightDifference = usableHeightSansKeyboard - usableHeightNow;
             if (heightDifference > (usableHeightSansKeyboard / 4)) {
                 ViewGroup.LayoutParams params = getLayoutParams();
@@ -124,7 +122,7 @@ public class ResizeLayoutView extends RelativeLayout implements
 
     private int computeUsableHeight() {
         Rect r = new Rect();
-        mChildOfContent.getWindowVisibleDisplayFrame(r);
+        mActivityContentView.getWindowVisibleDisplayFrame(r);
         return (r.bottom - r.top);
     }
 
