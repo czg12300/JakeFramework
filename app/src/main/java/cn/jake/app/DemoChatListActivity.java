@@ -1,5 +1,7 @@
 package cn.jake.app;
 
+import cn.common.ui.widgt.ChatListView;
+
 /**
  * 描述:聊天列表
  *
@@ -11,5 +13,7 @@ public class DemoChatListActivity extends CommonTitleActivity{
   protected void initView() {
     setTitle("聊天列表");
     setContentView(R.layout.activity_chat);
+    ChatListView chatListView= (ChatListView) findViewById(R.id.lv_chat);
+    chatListView.setAdapter(new TestListAdapter(this));
   }
 }
