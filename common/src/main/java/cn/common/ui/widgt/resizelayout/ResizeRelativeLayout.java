@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
  * @author jakechen
  * @since 2016/2/22 10:01
  */
-public class ResizeLayoutView extends RelativeLayout implements
+public class ResizeRelativeLayout extends RelativeLayout implements
         ViewTreeObserver.OnGlobalLayoutListener {
     private Activity activity;
 
@@ -30,15 +30,15 @@ public class ResizeLayoutView extends RelativeLayout implements
 
     private int height = 0;
 
-    public ResizeLayoutView(Context context) {
+    public ResizeRelativeLayout(Context context) {
         this(context, null);
     }
 
-    public ResizeLayoutView(Context context, AttributeSet attrs) {
+    public ResizeRelativeLayout(Context context, AttributeSet attrs) {
         this(context, attrs, -1);
     }
 
-    public ResizeLayoutView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ResizeRelativeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         activity = ((Activity) context);
         mActivityContentView = activity.findViewById(android.R.id.content);

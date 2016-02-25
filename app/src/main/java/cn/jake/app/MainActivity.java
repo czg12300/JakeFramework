@@ -25,7 +25,7 @@ public class MainActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setListAdapter(new MyAdapter(this, getActivityList()));
-//        onListItemClick(getListView(), null, 0, 0);
+        onListItemClick(getListView(), null, 1, 0);
     }
 
     private List<Info> getActivityList() {

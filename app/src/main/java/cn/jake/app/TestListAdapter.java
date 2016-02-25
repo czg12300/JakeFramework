@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import cn.common.ui.adapter.BaseListAdapter;
@@ -22,10 +24,10 @@ public class TestListAdapter extends BaseListAdapter<String>{
     public TestListAdapter(Context context) {
       super(context,  getData());
     }
-  private static List<String> getData() {
+  public static List<String> getData() {
     List<String> list = new ArrayList<>();
-    for (int i = 0; i < 20; i++) {
-      list.add("测试数据");
+    for (int i = 0; i < 10; i++) {
+      list.add("测试数据"+new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(System.currentTimeMillis())));
     }
     return list;
   }

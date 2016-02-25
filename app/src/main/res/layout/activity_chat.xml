@@ -1,25 +1,32 @@
-<cn.common.ui.widgt.resizelayout.ResizeLayoutView
+<cn.common.ui.widgt.resizelayout.ResizeLinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<!--<ScrollView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content">-->
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_height="wrap_content">-->
-    <cn.common.ui.widgt.ChatListView
-        android:id="@+id/lv_chat"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/ev_chat"/>
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_above="@+id/ev_chat"-->
+        <!--android:layout_below="@+id/ev_chat0"-->
+        <!--android:layout_weight="1">-->
+
+    <!--<ListView-->
+    <!--android:id="@+id/lv_chat"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:visibility="visible"-->
+    <!--/>-->
+    <!--</ScrollView>-->
+<cn.common.ui.widgt.pull.PullToRefreshLayout
+    android:id="@+id/pull"
+    android:layout_width="match_parent"
+    android:layout_weight="1"
+    android:layout_height="wrap_content"/>
     <EditText
         android:id="@+id/ev_chat"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"/>
-    <!--</LinearLayout>-->
-<!--</ScrollView>-->
-</cn.common.ui.widgt.resizelayout.ResizeLayoutView>
+</cn.common.ui.widgt.resizelayout.ResizeLinearLayout>
