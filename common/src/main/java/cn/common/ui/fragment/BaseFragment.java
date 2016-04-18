@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.common.eventbus.EventBus;
 import cn.common.ui.activity.IUi;
 
 public abstract class BaseFragment extends Fragment implements IUi {
@@ -199,7 +200,14 @@ public abstract class BaseFragment extends Fragment implements IUi {
             Bundle savedInstanceState) {
         mDecorView = new FrameLayout(getActivity());
         mSavedInstanceState = savedInstanceState;
+        EventBus.getDefault().register(this.getClass().getClassLoader(), this.getClass().getName(), this);
         return mDecorView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override

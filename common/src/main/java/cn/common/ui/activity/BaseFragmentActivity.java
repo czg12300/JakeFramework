@@ -8,12 +8,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.common.eventbus.EventBus;
 
 public abstract class BaseFragmentActivity extends FragmentActivity implements IUi {
   protected static final int REQUEST_CODE = 0x123f;
@@ -57,6 +63,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements I
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    EventBus.getDefault().register(this.getClass().getClassLoader(), this.getClass().getName(), this);
     BaseApplication.getInstance().addActivity(this);
     dealIntent(getIntent().getExtras());
     mUiHandler = new UiHandler(this);
@@ -76,7 +83,13 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements I
       registerReceiver(mReceiver, filter);
     }
   }
-
+  protected void loadImage(String url, ImageView view) {
+    if (view != null && !TextUtils.isEmpty(url)) {
+      Glide.with(this).load(url)
+              .placeholder(BaseApplication.getInstance().getDefaultImageResourse())
+              .crossFade(800).into(view);
+    }
+  }
   protected void dealIntent(Bundle data) {
   }
 
@@ -86,6 +99,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements I
     if (mReceiver != null) {
       unregisterReceiver(mReceiver);
     }
+    EventBus.getDefault().unregister(this);
     BaseApplication.getInstance().removeActivity(this.getClass().getSimpleName());
   }
 

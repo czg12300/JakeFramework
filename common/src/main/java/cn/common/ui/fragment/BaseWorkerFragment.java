@@ -6,8 +6,14 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.text.TextUtils;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
+
+import cn.common.ui.activity.BaseApplication;
 
 public abstract class BaseWorkerFragment extends BaseFragment {
 
@@ -46,6 +52,14 @@ public abstract class BaseWorkerFragment extends BaseFragment {
         super.onDestroy();
         if (mBackgroundHandler != null && mBackgroundHandler.getLooper() != null) {
             mBackgroundHandler.getLooper().quit();
+        }
+    }
+
+    protected void loadImage(String url, ImageView view) {
+        if (view != null && !TextUtils.isEmpty(url)) {
+            Glide.with(this).load(url)
+                    .placeholder(BaseApplication.getInstance().getDefaultImageResourse())
+                    .crossFade(800).into(view);
         }
     }
 

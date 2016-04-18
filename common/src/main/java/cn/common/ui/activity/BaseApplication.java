@@ -9,6 +9,8 @@ import android.os.Process;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
+import cn.common.R;
+
 /**
  * Created by jakechen on 2015/8/5.
  */
@@ -35,10 +37,14 @@ public abstract class BaseApplication extends Application {
 
     protected abstract void onRelease();
 
+    public int getDefaultImageResourse() {
+        return R.drawable.ic_launcher;
+    }
+
     public void addActivity(Activity activity) {
         if (activity != null) {
-            mActivityMap.put(activity.getClass().getSimpleName(),
-                    new WeakReference<Activity>(activity));
+            mActivityMap.put(activity.getClass().getSimpleName(), new WeakReference<Activity>(
+                    activity));
         }
     }
 
@@ -60,10 +66,13 @@ public abstract class BaseApplication extends Application {
         android.os.Process.killProcess(Process.myPid());
         System.exit(0);
     }
+
     public Context getContext() {
         return getApplicationContext();
     }
+
     protected abstract BaseApplication getChildInstance();
+
     public static synchronized BaseApplication getInstance() {
         return mInstance;
     }
