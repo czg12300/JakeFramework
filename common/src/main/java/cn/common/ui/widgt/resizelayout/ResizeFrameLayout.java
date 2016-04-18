@@ -1,4 +1,4 @@
-
+﻿
 package cn.common.ui.widgt.resizelayout;
 
 import android.app.Activity;
@@ -78,7 +78,10 @@ public class ResizeFrameLayout extends FrameLayout implements
                 }
             } else {
                 ViewGroup.LayoutParams params = getLayoutParams();
-                params.height = height;
+                //避免第一次布局的时候造成布局混乱，导致setVisibility();失效
+                if (params.height > 0) {
+                    params.height = height;
+                }
                 requestLayout();
                 if (onResizeListener != null) {
                     onResizeListener.onKeyboardHide();
