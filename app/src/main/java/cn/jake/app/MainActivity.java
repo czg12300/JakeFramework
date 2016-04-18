@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.common.eventbus.EventBus;
 import cn.common.ui.adapter.BaseListAdapter;
 
 public class MainActivity extends ListActivity {
@@ -26,6 +27,7 @@ public class MainActivity extends ListActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setListAdapter(new MyAdapter(this, getActivityList()));
         onListItemClick(getListView(), null, 1, 0);
+        EventBus.getDefault().register(getClassLoader(), MainActivity.class.getName(), this);
     }
 
     private List<Info> getActivityList() {
@@ -33,6 +35,12 @@ public class MainActivity extends ListActivity {
         list.add(new Info("下拉刷新", DemoPullRefreshActivity.class));
         list.add(new Info("聊天列表", DemoChatListActivity.class));
         return list;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
